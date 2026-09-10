@@ -1,6 +1,10 @@
-// Lokales Admin-Skript: liest einen Goodreads-CSV-Export und schreibt die
-// Bücher in die Supabase-Tabelle "books". Läuft nur auf deinem Rechner
+// Lokales Admin-Skript: liest einen Goodreads-CSV-Export und gleicht ihn mit
+// der Supabase-Tabelle "books" ab. Läuft nur auf deinem Rechner
 // (node scripts/import-goodreads.js <pfad-zur-csv>), nie im Browser.
+//
+// Abgleich statt Löschen: neue Bücher werden eingefügt, bereits vorhandene
+// nur bei Status/Bewertung/Notiz aktualisiert - Genre, Zusammenfassung und
+// Serien-Info (von Claude generiert) bleiben unangetastet.
 
 require("dotenv").config({ path: ".env.local" });
 
@@ -33,11 +37,16 @@ function mapRow(row) {
     titel: row["Title"],
     autor: row["Author"],
     status: STATUS_MAP[row["Exclusive Shelf"]] ?? "moechte-ich",
-    genre: null,
     rating: ratingValue > 0 ? ratingValue : null,
     notizen: row["My Review"] || null,
     isbn: extractIsbn(row["ISBN13"]) || extractIsbn(row["ISBN"]),
   };
+}
+
+// Abgleichs-Schlüssel: normalisierter Titel + Autor. ISBN wäre eindeutiger,
+// fehlt bei manchen Goodreads-Einträgen aber (z.B. Kindle-Samples).
+function keyFor(titel, autor) {
+  return `${titel.trim().toLowerCase()}|${autor.trim().toLowerCase()}`;
 }
 
 async function main() {
@@ -49,26 +58,73 @@ async function main() {
 
   const raw = fs.readFileSync(path.resolve(csvPath), "utf-8");
   const rows = parse(raw, { columns: true, skip_empty_lines: true });
-  const books = rows.map(mapRow);
+  const csvBooks = rows.map(mapRow);
 
-  console.log(`Gelesen: ${books.length} Bücher aus der CSV.`);
-  console.log("Lösche vorhandene Beispieldaten...");
+  console.log(`Gelesen: ${csvBooks.length} Bücher aus der CSV.`);
 
-  const { error: deleteError } = await supabase.from("books").delete().gte("id", 0);
-  if (deleteError) {
-    console.error("Fehler beim Löschen:", deleteError.message);
+  const { data: vorhandene, error: loadError } = await supabase
+    .from("books")
+    .select("id, titel, autor, status, rating, notizen");
+
+  if (loadError) {
+    console.error("Fehler beim Laden der Bibliothek:", loadError.message);
     process.exit(1);
   }
 
-  console.log("Schreibe Goodreads-Import in die Datenbank...");
+  const vorhandeneNachKey = new Map(
+    vorhandene.map((b) => [keyFor(b.titel, b.autor), b])
+  );
 
-  const { error: insertError } = await supabase.from("books").insert(books);
-  if (insertError) {
-    console.error("Fehler beim Import:", insertError.message);
-    process.exit(1);
+  const neue = [];
+  const aktualisierungen = [];
+
+  for (const buch of csvBooks) {
+    const bestehend = vorhandeneNachKey.get(keyFor(buch.titel, buch.autor));
+
+    if (!bestehend) {
+      neue.push({ ...buch, genre: null, zusammenfassung: null, reihe: null });
+      continue;
+    }
+
+    const geaendert =
+      bestehend.status !== buch.status ||
+      bestehend.rating !== buch.rating ||
+      bestehend.notizen !== buch.notizen;
+
+    if (geaendert) {
+      aktualisierungen.push({
+        id: bestehend.id,
+        status: buch.status,
+        rating: buch.rating,
+        notizen: buch.notizen,
+      });
+    }
   }
 
-  console.log(`Fertig! ${books.length} Bücher importiert.`);
+  console.log(`Neu: ${neue.length}, Aktualisiert: ${aktualisierungen.length}, Unverändert: ${csvBooks.length - neue.length - aktualisierungen.length}`);
+
+  if (neue.length > 0) {
+    const { error: insertError } = await supabase.from("books").insert(neue);
+    if (insertError) {
+      console.error("Fehler beim Einfügen neuer Bücher:", insertError.message);
+      process.exit(1);
+    }
+  }
+
+  for (const update of aktualisierungen) {
+    const { id, ...felder } = update;
+    const { error: updateError } = await supabase.from("books").update(felder).eq("id", id);
+    if (updateError) {
+      console.error(`Fehler beim Aktualisieren von Buch ${id}:`, updateError.message);
+    }
+  }
+
+  console.log("Fertig!");
+  if (neue.length > 0) {
+    console.log(
+      `Tipp: node scripts/classify-genres.js und node scripts/generate-summaries.js laufen lassen, um die ${neue.length} neuen Bücher zu vervollständigen.`
+    );
+  }
 }
 
 main();
