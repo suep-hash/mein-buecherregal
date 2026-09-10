@@ -1,0 +1,17 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 48px 24px;
+  font-family: var(--font-geist-sans);
+}
+
+.main {
+  width: 100%;
+  max-width: 800px;
+}
+
+.main h1 {
+  margin-bottom: 24px;
+}

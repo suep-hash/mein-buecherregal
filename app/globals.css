@@ -1,0 +1,495 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.controlBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.statusTabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tabButton,
+.tabActive {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tabActive {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.searchInput {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  font-size: 14px;
+  min-width: 220px;
+}
+
+.sortSelect {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .controlBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchInput,
+  .sortSelect,
+  .discoverForm .searchInput {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.genreFilterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.genrePill,
+.genrePillActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.genrePillActive {
+  border-color: var(--foreground);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.genreDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.genreShelf {
+  margin-bottom: 36px;
+}
+
+.genreShelf h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.shelfCount {
+  font-size: 13px;
+  font-weight: 400;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.shelfRow {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-color: #5a3a22 transparent;
+  scrollbar-width: thin;
+}
+
+.shelfRow::-webkit-scrollbar {
+  height: 10px;
+}
+
+.shelfRow::-webkit-scrollbar-thumb {
+  background: #5a3a22;
+  border-radius: 999px;
+}
+
+.shelfRow::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bookSpine {
+  flex-shrink: 0;
+  width: 42px;
+  height: 190px;
+  border: none;
+  border-bottom: 10px solid #5a3a22;
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset -4px 0 6px rgba(0, 0, 0, 0.15);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 4px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+
+.bookSpine:hover {
+  transform: translateY(-6px);
+}
+
+.bookCover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.bookCoverPlaceholder {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bookCard {
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--background);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.modalContent {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modalClose {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.bookCard h3 {
+  font-size: 16px;
+}
+
+.author {
+  font-size: 14px;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+.genre {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.genreButton {
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, currentColor 35%, transparent);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.genreButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.genreError {
+  font-size: 12px;
+  color: #c0392b;
+}
+
+.recommendationBox {
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.recommendButton {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.recommendButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.recommendationResult {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.recommendationResult p {
+  margin-top: 4px;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+.discoverBox {
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.discoverBox h2 {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.discoverHint {
+  font-size: 13px;
+  color: color-mix(in srgb, currentColor 60%, transparent);
+  margin-bottom: 12px;
+}
+
+.discoverForm {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.discoverForm .searchInput {
+  flex: 1;
+  min-width: 240px;
+}
+
+.discoverResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.discoverCard {
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.discoverCardDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.discoverCardBody strong {
+  font-size: 14px;
+}
+
+.discoverDescription {
+  font-size: 13px;
+  line-height: 1.4;
+  color: color-mix(in srgb, currentColor 75%, transparent);
+  margin-top: 4px;
+}
+
+.addButton {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.addButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.statusBadge {
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.stars {
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.starsEmpty {
+  font-size: 13px;
+  color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+.notes {
+  font-size: 13px;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+  margin-top: 4px;
+}
+
+.summaryText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: color-mix(in srgb, currentColor 80%, transparent);
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.summaryLoading {
+  font-size: 12px;
+  color: color-mix(in srgb, currentColor 50%, transparent);
+  font-style: italic;
+}
+
+.seriesInfo {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seriesPosition {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seriesList {
+  font-size: 12px;
+  color: color-mix(in srgb, currentColor 65%, transparent);
+}
+
+.seriesList span {
+  font-weight: 600;
+  color: inherit;
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "titel": "Die Verwandlung",
+    "autor": "Franz Kafka",
+    "status": "gelesen",
+    "genre": "Klassiker",
+    "rating": 4.5,
+    "notizen": "Beklemmend, aber wunderbar geschrieben."
+  },
+  {
+    "id": 2,
+    "titel": "Sapiens",
+    "autor": "Yuval Noah Harari",
+    "status": "gelesen",
+    "genre": "Sachbuch",
+    "rating": 5,
+    "notizen": "Verändert, wie man über Geschichte denkt."
+  },
+  {
+    "id": 3,
+    "titel": "Projekt Hail Mary",
+    "autor": "Andy Weir",
+    "status": "lese-ich",
+    "genre": "Science-Fiction",
+    "rating": null,
+    "notizen": "Bin bei Kapitel 12, richtig mitreißend."
+  },
+  {
+    "id": 4,
+    "titel": "Der Circle",
+    "autor": "Dave Eggers",
+    "status": "moechte-ich",
+    "genre": "Dystopie",
+    "rating": null,
+    "notizen": ""
+  },
+  {
+    "id": 5,
+    "titel": "Atomic Habits",
+    "autor": "James Clear",
+    "status": "gelesen",
+    "genre": "Sachbuch",
+    "rating": 3.5,
+    "notizen": "Gute Praxistipps, etwas repetitiv."
+  },
+  {
+    "id": 6,
+    "titel": "Klara and the Sun",
+    "autor": "Kazuo Ishiguro",
+    "status": "moechte-ich",
+    "genre": "Roman",
+    "rating": null,
+    "notizen": "Empfehlung von einer Freundin."
+  }
+]
