@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import GenreShelf from "./GenreShelf";
+import SeriesShelf from "./SeriesShelf";
 import BookDetailModal from "./BookDetailModal";
 import DiscoverBooks from "./DiscoverBooks";
 import { GENRES } from "@/lib/genres";
@@ -21,6 +22,7 @@ export default function BookList({ books: initialBooks }) {
   const [genreFilter, setGenreFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("standard");
+  const [viewMode, setViewMode] = useState("genre");
   const [selectedBook, setSelectedBook] = useState(null);
 
   function handleGenreUpdated(id, genre) {
@@ -43,7 +45,8 @@ export default function BookList({ books: initialBooks }) {
       if (suchbegriff) {
         const treffer =
           book.titel.toLowerCase().includes(suchbegriff) ||
-          book.autor.toLowerCase().includes(suchbegriff);
+          book.autor.toLowerCase().includes(suchbegriff) ||
+          (book.reihe?.name ?? "").toLowerCase().includes(suchbegriff);
         if (!treffer) return false;
       }
       return true;
@@ -57,6 +60,25 @@ export default function BookList({ books: initialBooks }) {
   }, [books, statusFilter, genreFilter, search, sortBy]);
 
   const ohneGenre = gefiltert.filter((book) => !book.genre || !BEKANNTE_GENRES.has(book.genre));
+
+  const seriesGruppen = useMemo(() => {
+    const gruppen = new Map();
+    for (const book of gefiltert) {
+      const name = book.reihe?.name;
+      if (!name) continue;
+      if (!gruppen.has(name)) gruppen.set(name, []);
+      gruppen.get(name).push(book);
+    }
+    return Array.from(gruppen.entries())
+      .map(([name, gruppenBuecher]) => ({
+        name,
+        gesamt: gruppenBuecher[0]?.reihe?.gesamt ?? null,
+        buecher: [...gruppenBuecher].sort(
+          (a, b) => (a.reihe?.position ?? 0) - (b.reihe?.position ?? 0)
+        ),
+      }))
+      .sort((a, b) => b.buecher.length - a.buecher.length || a.name.localeCompare(b.name));
+  }, [gefiltert]);
 
   function handleBookAdded(book) {
     setBooks((prev) => [...prev, book]);
@@ -97,33 +119,72 @@ export default function BookList({ books: initialBooks }) {
 
       <div className="genreFilterBar">
         <button
-          onClick={() => setGenreFilter("alle")}
-          className={genreFilter === "alle" ? "genrePillActive" : "genrePill"}
+          onClick={() => setViewMode("genre")}
+          className={viewMode === "genre" ? "genrePillActive" : "genrePill"}
         >
-          Alle Genres
+          Nach Genre
         </button>
-        {GENRES.map((genre) => (
-          <button
-            key={genre.id}
-            onClick={() => setGenreFilter(genre.id)}
-            className={genreFilter === genre.id ? "genrePillActive" : "genrePill"}
-          >
-            <span className="genreDot" style={{ background: genre.color }} />
-            {genre.id}
-          </button>
-        ))}
+        <button
+          onClick={() => setViewMode("serie")}
+          className={viewMode === "serie" ? "genrePillActive" : "genrePill"}
+        >
+          Nach Serie
+        </button>
       </div>
 
-      {GENRES.map((genre) => (
-        <GenreShelf
-          key={genre.id}
-          genre={genre.id}
-          books={gefiltert.filter((book) => book.genre === genre.id)}
-          onSelect={setSelectedBook}
-        />
-      ))}
+      {viewMode === "genre" && (
+        <div className="genreFilterBar">
+          <button
+            onClick={() => setGenreFilter("alle")}
+            className={genreFilter === "alle" ? "genrePillActive" : "genrePill"}
+          >
+            Alle Genres
+          </button>
+          {GENRES.map((genre) => (
+            <button
+              key={genre.id}
+              onClick={() => setGenreFilter(genre.id)}
+              className={genreFilter === genre.id ? "genrePillActive" : "genrePill"}
+            >
+              <span className="genreDot" style={{ background: genre.color }} />
+              {genre.id}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {genreFilter === "alle" && <GenreShelf genre="Ohne Genre" books={ohneGenre} onSelect={setSelectedBook} />}
+      {viewMode === "genre" && (
+        <>
+          {GENRES.map((genre) => (
+            <GenreShelf
+              key={genre.id}
+              genre={genre.id}
+              books={gefiltert.filter((book) => book.genre === genre.id)}
+              onSelect={setSelectedBook}
+            />
+          ))}
+          {genreFilter === "alle" && (
+            <GenreShelf genre="Ohne Genre" books={ohneGenre} onSelect={setSelectedBook} />
+          )}
+        </>
+      )}
+
+      {viewMode === "serie" && (
+        <>
+          {seriesGruppen.map((gruppe) => (
+            <SeriesShelf
+              key={gruppe.name}
+              name={gruppe.name}
+              books={gruppe.buecher}
+              gesamt={gruppe.gesamt}
+              onSelect={setSelectedBook}
+            />
+          ))}
+          {seriesGruppen.length === 0 && (
+            <p>Keine Serien-Infos gefunden (öffne ein paar Bücher, damit Claude sie erkennt).</p>
+          )}
+        </>
+      )}
 
       {gefiltert.length === 0 && <p>Keine Bücher gefunden.</p>}
 
