@@ -1,5 +1,6 @@
 // TEMPORÄR - nur zur Fehlersuche, danach wieder löschen.
 // Gibt KEINE echten Werte preis, nur Länge und ob Nicht-ASCII-Zeichen enthalten sind.
+// (Re-Check nach Korrektur von ANTHROPIC_API_KEY)
 
 function check(name, value) {
   if (!value) return { name, status: "FEHLT" };
