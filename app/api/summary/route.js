@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+export const maxDuration = 60;
+
 const client = new Anthropic();
 
 const REIHE_SCHEMA =

@@ -2,6 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { GENRES } from "@/lib/genres";
 
+export const maxDuration = 60;
+
 const client = new Anthropic();
 const GENRE_NAMES = GENRES.map((g) => g.id);
 

@@ -2,6 +2,10 @@ import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { GENRES } from "@/lib/genres";
 
+// Vercel-Funktionen brechen sonst nach 10s ab - diese Route schickt eine
+// lange Buchliste an Claude und braucht öfter mehr Zeit.
+export const maxDuration = 60;
+
 const client = new Anthropic();
 const GENRE_NAMES = GENRES.map((g) => g.id);
 
