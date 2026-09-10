@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+// Force-rebuild trigger, damit Vercel die aktuellen Env-Var-Werte neu in den Build einliest.
 export const maxDuration = 60;
 
 const client = new Anthropic();
