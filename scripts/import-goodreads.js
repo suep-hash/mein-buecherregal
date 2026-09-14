@@ -31,6 +31,15 @@ function extractIsbn(value) {
   return cleaned || null;
 }
 
+// Goodreads schreibt Datumsfelder als "YYYY/MM/DD" - Postgres will "YYYY-MM-DD".
+function parseGoodreadsDate(value) {
+  if (!value) return null;
+  const teile = value.trim().split("/");
+  if (teile.length !== 3) return null;
+  const [jahr, monat, tag] = teile;
+  return `${jahr}-${monat.padStart(2, "0")}-${tag.padStart(2, "0")}`;
+}
+
 function mapRow(row) {
   const ratingValue = Number(row["My Rating"]);
   return {
@@ -40,6 +49,7 @@ function mapRow(row) {
     rating: ratingValue > 0 ? ratingValue : null,
     notizen: row["My Review"] || null,
     isbn: extractIsbn(row["ISBN13"]) || extractIsbn(row["ISBN"]),
+    gelesen_am: parseGoodreadsDate(row["Date Read"]),
   };
 }
 
@@ -64,7 +74,7 @@ async function main() {
 
   const { data: vorhandene, error: loadError } = await supabase
     .from("books")
-    .select("id, titel, autor, status, rating, notizen");
+    .select("id, titel, autor, status, rating, notizen, gelesen_am");
 
   if (loadError) {
     console.error("Fehler beim Laden der Bibliothek:", loadError.message);
@@ -89,7 +99,8 @@ async function main() {
     const geaendert =
       bestehend.status !== buch.status ||
       bestehend.rating !== buch.rating ||
-      bestehend.notizen !== buch.notizen;
+      bestehend.notizen !== buch.notizen ||
+      bestehend.gelesen_am !== buch.gelesen_am;
 
     if (geaendert) {
       aktualisierungen.push({
@@ -97,6 +108,7 @@ async function main() {
         status: buch.status,
         rating: buch.rating,
         notizen: buch.notizen,
+        gelesen_am: buch.gelesen_am,
       });
     }
   }

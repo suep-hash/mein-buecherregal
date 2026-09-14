@@ -319,6 +319,12 @@ a {
   color: #c0392b;
 }
 
+.yearStat {
+  font-size: 15px;
+  color: color-mix(in srgb, currentColor 65%, transparent);
+  margin-bottom: 16px;
+}
+
 .recommendationBox {
   margin-bottom: 24px;
   padding: 16px;
