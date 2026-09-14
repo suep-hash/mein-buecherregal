@@ -16,7 +16,7 @@ const supabase = createClient(
 const client = new Anthropic();
 
 const REIHE_SCHEMA =
-  '"reihe": null oder {"name": "<Reihenname>", "position": <Zahl>, "gesamt": <Zahl oder null>, "vorherige": [<Titel der Bände davor, chronologisch, auch falls nicht in der Bibliothek des Nutzers>], "naechste": [<Titel der Bände danach, chronologisch, auch falls nicht in der Bibliothek des Nutzers>]} - falls das Buch kein Teil einer Reihe ist, setze "reihe" auf null.';
+  '"reihe": null oder {"name": "<Reihenname IMMER im englischen Original, unabhängig von der Sprache dieser Buchausgabe, damit alle Bände einer Reihe denselben Namen tragen - z.B. \'A Court of Thorns and Roses\', NICHT \'Reich der sieben Höfe\'>", "position": <Zahl>, "gesamt": <Zahl oder null>, "vorherige": [<Titel der Bände davor, chronologisch, auch falls nicht in der Bibliothek des Nutzers>], "naechste": [<Titel der Bände danach, chronologisch, auch falls nicht in der Bibliothek des Nutzers>]} - falls das Buch kein Teil einer Reihe ist, setze "reihe" auf null.';
 
 const JSON_HINWEIS =
   'Antworte NUR mit gültigem JSON, ohne Markdown-Codeblock, ohne weiteren Text. Verwende innerhalb der Textwerte NIEMALS gerade doppelte Anführungszeichen (") - nutze stattdessen einfache Anführungszeichen (\') oder Guillemets (« »), falls du etwas hervorheben oder zitieren willst.';

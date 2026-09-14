@@ -7,7 +7,7 @@ export const maxDuration = 60;
 const client = new Anthropic();
 
 const REIHE_SCHEMA =
-  '"reihe": null oder {"name": "<Reihenname>", "position": <Zahl>, "gesamt": <Zahl oder null>, "vorherige": [<Titel der Bände davor, chronologisch, auch falls nicht in der Bibliothek des Nutzers>], "naechste": [<Titel der Bände danach, chronologisch, auch falls nicht in der Bibliothek des Nutzers>]} - falls das Buch kein Teil einer Reihe ist, setze "reihe" auf null.';
+  '"reihe": null oder {"name": "<Reihenname IMMER im englischen Original, unabhängig von der Sprache dieser Buchausgabe, damit alle Bände einer Reihe denselben Namen tragen - z.B. \'A Court of Thorns and Roses\', NICHT \'Reich der sieben Höfe\'>", "position": <Zahl>, "gesamt": <Zahl oder null>, "vorherige": [<Titel der Bände davor, chronologisch, auch falls nicht in der Bibliothek des Nutzers>], "naechste": [<Titel der Bände danach, chronologisch, auch falls nicht in der Bibliothek des Nutzers>]} - falls das Buch kein Teil einer Reihe ist, setze "reihe" auf null.';
 
 // Wichtig: erzwingt gültiges JSON. Ohne diesen Hinweis nutzt Claude gelegentlich
 // normale Anführungszeichen für Zitate/Ironie *innerhalb* der Strings, was das
