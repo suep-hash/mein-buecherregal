@@ -68,9 +68,19 @@ async function main() {
 
   const raw = fs.readFileSync(path.resolve(csvPath), "utf-8");
   const rows = parse(raw, { columns: true, skip_empty_lines: true });
-  const csvBooks = rows.map(mapRow);
+  // Manuell aussortierte Doubletten (andere Ausgabe desselben Buchs) - sonst
+  // würden sie bei jedem Re-Import als "neu" zurückkommen.
+  const ignoriert = new Set(
+    JSON.parse(fs.readFileSync(path.join(__dirname, "import-ignore.json"), "utf-8")).map((b) =>
+      keyFor(b.titel, b.autor)
+    )
+  );
+  const alleCsvBooks = rows.map(mapRow);
+  const csvBooks = alleCsvBooks.filter((b) => !ignoriert.has(keyFor(b.titel, b.autor)));
 
-  console.log(`Gelesen: ${csvBooks.length} Bücher aus der CSV.`);
+  console.log(
+    `Gelesen: ${alleCsvBooks.length} Bücher aus der CSV (${alleCsvBooks.length - csvBooks.length} ignoriert).`
+  );
 
   const { data: vorhandene, error: loadError } = await supabase
     .from("books")
