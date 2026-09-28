@@ -113,13 +113,24 @@ async function main() {
       bestehend.gelesen_am !== buch.gelesen_am;
 
     if (geaendert) {
-      aktualisierungen.push({
+      const update = {
         id: bestehend.id,
         status: buch.status,
         rating: buch.rating,
         notizen: buch.notizen,
         gelesen_am: buch.gelesen_am,
-      });
+      };
+
+      // Wechsel zu "gelesen": die bestehende Zusammenfassung war (falls
+      // vorhanden) die kurze, spoilerfreie Variante fürs Ungelesen-Regal -
+      // die muss durch eine ausführliche Handlungszusammenfassung ersetzt
+      // werden. Zurücksetzen, generate-summaries.js holt sie neu.
+      if (bestehend.status !== "gelesen" && buch.status === "gelesen") {
+        update.zusammenfassung = null;
+        update.reihe = null;
+      }
+
+      aktualisierungen.push(update);
     }
   }
 
